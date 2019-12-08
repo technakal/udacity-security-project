@@ -41,11 +41,19 @@ public class UserController {
 		ApplicationUser user = new ApplicationUser();
 		user.setUsername(createUserRequest.getUsername());
 		String password = createUserRequest.getPassword();
-		String confirmPassword = createUserRequest.getPassword();
+		String confirmPassword = createUserRequest.getConfirmPassword();
 		Cart cart = new Cart();
 		cartRepository.save(cart);
 		user.setCart(cart);
-		if(createUserRequest.getPassword().length() < 8) {
+		if(
+				createUserRequest.getUsername() == null ||
+  			createUserRequest.getPassword() == null ||
+				createUserRequest.getConfirmPassword() == null
+		) {
+			String missingDataError = "Bad request: create user requires username, password, and confirm password.";
+			System.err.println(missingDataError);
+			return new ResponseEntity(missingDataError, HttpStatus.BAD_REQUEST);
+		} else if(createUserRequest.getPassword().length() < 8) {
 			String badPasswordError = "Bad request: user password is not long enough.";
 			System.err.println(badPasswordError);
 			return new ResponseEntity(badPasswordError, HttpStatus.BAD_REQUEST);
