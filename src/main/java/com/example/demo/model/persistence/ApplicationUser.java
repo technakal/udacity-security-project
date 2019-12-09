@@ -72,11 +72,11 @@ public class ApplicationUser {
 
 	@Override
 	public String toString() {
-		return "User{" +
-				"username='" + username + '\'' +
+		return "ApplicationUser{" +
+				"id=" + id +
+				", username='" + username + '\'' +
 				", password='" + password + '\'' +
 				", cart=" + cart +
 				'}';
 	}
-
 }
