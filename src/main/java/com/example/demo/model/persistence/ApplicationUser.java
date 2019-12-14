@@ -38,6 +38,12 @@ public class ApplicationUser {
 		this.password = password;
 	}
 
+	public ApplicationUser(String username, String password, Cart cart) {
+		this.username = username;
+		this.password = password;
+		this.cart = cart;
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -72,11 +78,11 @@ public class ApplicationUser {
 
 	@Override
 	public String toString() {
-		return "User{" +
-				"username='" + username + '\'' +
+		return "ApplicationUser{" +
+				"id=" + id +
+				", username='" + username + '\'' +
 				", password='" + password + '\'' +
 				", cart=" + cart +
 				'}';
 	}
-
 }

@@ -37,6 +37,4 @@ public class ModifyCartRequest {
 		this.quantity = quantity;
 	}
 	
-	
-
 }
