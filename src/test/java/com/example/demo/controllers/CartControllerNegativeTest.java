@@ -10,7 +10,6 @@ import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.ModifyCartRequest;
 import com.example.demo.util.LogHelper;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -21,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,21 +28,33 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class CartControllerTest {
+public class CartControllerNegativeTest {
 
   private static final Logger log = LoggerFactory.getLogger(CartController.class);
 
   private CartController testCartController;
   private CartRepository testCartRepository = mock(CartRepository.class);
-  private ItemRepository testItemRepository = mock(ItemRepository.class);
-  private UserRepository testUserRepository = mock(UserRepository.class);
-  private ApplicationUser testUser = mock(ApplicationUser.class);
+
+  @Autowired
+  private UserRepository testUserRepository;
+
+  @Autowired
+  private ItemRepository testItemRepository;
+
   private Item testItem;
   private Cart testCart;
+  private ApplicationUser testUser;
 
   @Before
   public void setup() {
     testCartController = new CartController();
+
+    // create test user
+    testUser = new ApplicationUser();
+    testUser.setId(0L);
+    testUser.setUsername("john_smith");
+    testUser.setPassword("password123");
+    testUserRepository.save(testUser);
 
     // create item
     testItem = new Item();
@@ -53,9 +62,12 @@ public class CartControllerTest {
     testItem.setName("Test Item");
     testItem.setDescription("A really generic test item.");
     testItem.setPrice(new BigDecimal(2.99));
+    testItemRepository.save(testItem);
 
     testCart = new Cart();
-    testCart.setItems(Arrays.asList(testItem));
+    testCart.addItem(testItem);
+    testCart.setUser(testUser);
+    log.debug(LogHelper.buildLogString(testCart.toString()));
 
     TestUtils.injectObject(testCartController, "cartRepository", testCartRepository);
     TestUtils.injectObject(testCartController, "userRepository", testUserRepository);
@@ -63,25 +75,41 @@ public class CartControllerTest {
   }
 
   @Test
-  public void add_to_cart_happy_path() throws Exception {
+  public void add_to_cart_no_user() throws Exception {
     ModifyCartRequest request = new ModifyCartRequest();
-    request.setUsername("john_smith");
-    request.setItemId(0L);
-    request.setQuantity(2);
-    when(testUserRepository.findByUsername("john_smith")).thenReturn(new ApplicationUser("john_smith", "password123", testCart));
-//    when(testItemRepository.findById(0L)).thenReturn(Optional.ofNullable(testItem));
     final ResponseEntity<Cart> response = testCartController.addToCart(request);
     assertNotNull(response);
+    assertEquals(404, response.getStatusCodeValue());
   }
 
   @Test
-  public void remove_from_cart_happy_path() throws Exception {
+  public void add_to_cart_item_not_found() throws Exception {
     ModifyCartRequest request = new ModifyCartRequest();
     request.setUsername("john_smith");
-    request.setItemId(testItem.getId());
+    request.setItemId(99L);
+    request.setQuantity(2);
+    final ResponseEntity<Cart> response = testCartController.addToCart(request);
+    assertNotNull(response);
+    assertEquals(404, response.getStatusCodeValue());
+  }
+
+  @Test
+  public void remove_from_cart_no_user() throws Exception {
+    ModifyCartRequest request = new ModifyCartRequest();
+    final ResponseEntity<Cart> response = testCartController.removeFromCart(request);
+    assertNotNull(response);
+    assertEquals(404, response.getStatusCodeValue());
+  }
+
+  @Test
+  public void remove_from_cart_item_not_found() throws Exception {
+    ModifyCartRequest request = new ModifyCartRequest();
+    request.setUsername("john_smith");
+    request.setItemId(99L);
     request.setQuantity(2);
     final ResponseEntity<Cart> response = testCartController.removeFromCart(request);
     assertNotNull(response);
+    assertEquals(404, response.getStatusCodeValue());
   }
 
 }

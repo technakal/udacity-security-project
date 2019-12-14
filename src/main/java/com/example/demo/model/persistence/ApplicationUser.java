@@ -38,6 +38,12 @@ public class ApplicationUser {
 		this.password = password;
 	}
 
+	public ApplicationUser(String username, String password, Cart cart) {
+		this.username = username;
+		this.password = password;
+		this.cart = cart;
+	}
+
 	public long getId() {
 		return id;
 	}

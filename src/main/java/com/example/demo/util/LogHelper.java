@@ -7,15 +7,15 @@ public class LogHelper {
 
   public static String buildLogString(String message) {
     String logMessage = "devlog | ";
-    return logMessage + message;
+    return logMessage + message.trim();
   }
 
   public static String buildLogString(String[] messages) {
     String logMessage = "devlog | ";
     for (String message : messages) {
-      logMessage += message;
+      logMessage += message + " ";
     }
-    return logMessage;
+    return logMessage.trim();
   }
 
 }

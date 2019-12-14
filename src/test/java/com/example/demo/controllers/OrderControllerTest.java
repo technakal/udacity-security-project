@@ -86,9 +86,10 @@ public class OrderControllerTest {
 
   @Test
   public void get_history_happy_path() throws Exception {
-    when(testOrderRepository.findByUser(testUser)).thenReturn(Arrays.asList(testOrder));
+    when(testUserRepository.findByUsername("john_smith")).thenReturn(null);
     final ResponseEntity<List<UserOrder>> response = testOrderController.getOrdersForUser(testUser.getUsername());
     assertNotNull(response);
+    assertEquals(404, response.getStatusCodeValue());
   }
 
   @Test
