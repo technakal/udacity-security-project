@@ -5,7 +5,6 @@ import com.example.demo.model.persistence.ApplicationUser;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
-import com.example.demo.util.LogHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,6 +35,8 @@ public class UserControllerTest {
 
   @Test
   public void create_user_happy_path() throws Exception {
+    log.debug("Running test: create_user_happy_path");
+    log.debug("Stubbing password.");
     when(testBCryptEncoder.encode("test_password")).thenReturn("hashedPassword");
     CreateUserRequest userRequest = new CreateUserRequest();
     userRequest.setUsername("test_user");
@@ -53,16 +54,17 @@ public class UserControllerTest {
 
   @Test
   public void create_user_no_password() throws Exception {
+    log.debug("Running test: create_user_no_password");
     CreateUserRequest userRequest = new CreateUserRequest();
     userRequest.setUsername("test_user");
     final ResponseEntity<ApplicationUser> response = testUserController.createUser(userRequest);
     assertNotNull(response);
     assertEquals(400, response.getStatusCodeValue());
-    assertEquals("Bad request: create user requires username, password, and confirm password.", response.getBody());
   }
 
   @Test
   public void create_user_bad_password() throws Exception {
+    log.debug("Running test: create_user_bad_password");
     CreateUserRequest userRequest = new CreateUserRequest();
     userRequest.setUsername("test_user");
     userRequest.setPassword("passwo");
@@ -70,11 +72,11 @@ public class UserControllerTest {
     final ResponseEntity<ApplicationUser> response = testUserController.createUser(userRequest);
     assertNotNull(response);
     assertEquals(400, response.getStatusCodeValue());
-    assertEquals("Bad request: user password is not long enough.", response.getBody());
   }
 
   @Test
   public void create_user_mismatch_password() throws Exception {
+    log.debug("Running test: create_user_mismatch_password");
     CreateUserRequest userRequest = new CreateUserRequest();
     userRequest.setUsername("test_user");
     userRequest.setPassword("test_password");
@@ -82,11 +84,11 @@ public class UserControllerTest {
     final ResponseEntity<ApplicationUser> response = testUserController.createUser(userRequest);
     assertNotNull(response);
     assertEquals(400, response.getStatusCodeValue());
-    assertEquals("Bad request: password and confirm password do not match.", response.getBody());
   }
 
   @Test
   public void find_user_by_id_happy_path() throws Exception {
+    log.debug("Running test: find_user_by_id_happy_path");
     ApplicationUser defaultUser = new ApplicationUser();
     defaultUser.setId(0L);
     defaultUser.setUsername("default_user");
@@ -95,12 +97,14 @@ public class UserControllerTest {
     assertNotNull(response);
     assertEquals(200, response.getStatusCodeValue());
     ApplicationUser user = response.getBody();
+    assert user != null;
     assertEquals(0, user.getId());
     assertEquals("default_user", user.getUsername());
   }
 
   @Test
   public void find_user_by_id_not_found() throws Exception {
+    log.debug("Running test: find_user_by_id_not_found");
     final ResponseEntity<ApplicationUser> response = testUserController.findById(0L);
     assertNotNull(response);
     assertEquals(404, response.getStatusCodeValue());
@@ -108,6 +112,7 @@ public class UserControllerTest {
 
   @Test
   public void find_user_by_username_happy_path() throws Exception {
+    log.debug("Running test: find_user_by_username_happy_path");
     ApplicationUser defaultUser = new ApplicationUser();
     defaultUser.setId(0L);
     defaultUser.setUsername("default_user");
@@ -116,12 +121,14 @@ public class UserControllerTest {
     assertNotNull(response);
     assertEquals(200, response.getStatusCodeValue());
     ApplicationUser user = response.getBody();
+    assert user != null;
     assertEquals(0, user.getId());
     assertEquals("default_user", user.getUsername());
   }
 
   @Test
   public void find_user_by_username_not_found() throws Exception {
+    log.debug("Running test: find_user_by_username_not_found");
     final ResponseEntity<ApplicationUser> response = testUserController.findByUserName("default_user");
     assertNotNull(response);
     assertEquals(404, response.getStatusCodeValue());

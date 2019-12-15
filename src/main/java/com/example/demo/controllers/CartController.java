@@ -7,7 +7,6 @@ import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.ItemRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.ModifyCartRequest;
-import com.example.demo.util.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,45 +37,45 @@ public class CartController {
 	
 	@PostMapping("/addToCart")
 	public ResponseEntity<Cart> addToCart(@RequestBody ModifyCartRequest request) {
-		log.info(LogHelper.buildLogString(new String[]{"request to add item ", String.valueOf(request.getItemId()), " to cart"}));
+		log.info("Activity in CartController.");
+		log.info("POST request submitted to /addToCart");
 		ApplicationUser user = userRepository.findByUsername(request.getUsername());
 		if(user == null) {
-			log.info(LogHelper.buildLogString("user not found"));
+			log.info("POST /addToCart failed. CAUSE: User not found.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
 		if(!item.isPresent()) {
-			log.info(LogHelper.buildLogString("item not found"));
+			log.info("POST /addToCart failed. CAUSE: Item not found.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = user.getCart();
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.addItem(item.get()));
 		cartRepository.save(cart);
-		log.info(LogHelper.buildLogString("item added to cart"));
-		log.info(LogHelper.buildLogString("response 200 OK sent"));
+		log.info("POST /addToCart succeeded. RESPONSE: 200 OK");
 		return ResponseEntity.ok(cart);
 	}
 	
 	@PostMapping("/removeFromCart")
 	public ResponseEntity<Cart> removeFromCart(@RequestBody ModifyCartRequest request) {
-		log.info(LogHelper.buildLogString(new String[]{"request to remove item ", String.valueOf(request.getItemId()), " from cart"}));
+		log.info("Activity in CartController.");
+		log.info("POST request submitted to /removeFromCart");
 		ApplicationUser user = userRepository.findByUsername(request.getUsername());
 		if(user == null) {
-			log.info(LogHelper.buildLogString("user not found"));
+			log.info("POST /removeFromCart failed. CAUSE: User not found.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Optional<Item> item = itemRepository.findById(request.getItemId());
 		if(!item.isPresent()) {
-			log.info(LogHelper.buildLogString("item not found"));
+			log.info("POST /removeFromCart failed. CAUSE: Item not found.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = user.getCart();
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.removeItem(item.get()));
 		cartRepository.save(cart);
-		log.info(LogHelper.buildLogString("item removed from cart"));
-		log.info(LogHelper.buildLogString("response 200 OK sent"));
+		log.info("POST /removeFromCart succeeded. RESPONSE: 200 OK");
 		return ResponseEntity.ok(cart);
 	}
 		
