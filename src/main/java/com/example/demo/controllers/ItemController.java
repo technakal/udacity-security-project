@@ -2,7 +2,6 @@ package com.example.demo.controllers;
 
 import com.example.demo.model.persistence.Item;
 import com.example.demo.model.persistence.repositories.ItemRepository;
-import com.example.demo.util.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +29,22 @@ public class ItemController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Item> getItemById(@PathVariable Long id) {
-		log.info(LogHelper.buildLogString(new String[]{"request for item with id ", String.valueOf(id)}));
+		log.info("Activity in ItemController.");
+		log.info("GET request submitted to /item/{id}.");
 		return ResponseEntity.of(itemRepository.findById(id));
 	}
 	
 	@GetMapping("/name/{name}")
 	public ResponseEntity<List<Item>> getItemsByName(@PathVariable String name) {
-		log.info(LogHelper.buildLogString(new String[]{"request for item ", name}));
+		log.info("Activity in ItemController.");
+		log.info("GET request submitted to /item/name/{name}.");
 		List<Item> items = itemRepository.findByName(name);
-		return items == null || items.isEmpty() ? ResponseEntity.notFound().build()
-				: ResponseEntity.ok(items);
-			
+		if(items == null || items.isEmpty()) {
+			log.info("GET /item/name/{name} failed. CAUSE: Item not found.");
+			return ResponseEntity.notFound().build();
+		}
+		log.info("GET /item/name/{name} succeeded. RESPONSE: 200 OK.");
+		return ResponseEntity.ok(items);
 	}
 	
 }

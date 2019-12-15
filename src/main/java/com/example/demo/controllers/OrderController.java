@@ -5,11 +5,9 @@ import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.UserOrder;
 import com.example.demo.model.persistence.repositories.OrderRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
-import com.example.demo.util.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,33 +27,36 @@ public class OrderController {
 
 	@PostMapping("/submit/{username}")
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
-		log.info(LogHelper.buildLogString(new String[]{"submitting order for user ", username}));
+		log.info("Activity in OrderController.");
+		log.info("POST request submitted to /submit/{username}.");
 		ApplicationUser user = userRepository.findByUsername(username);
 		if(user == null) {
-			log.info(LogHelper.buildLogString("user not found"));
+			log.info("POST /submit/{username} failed. CAUSE: User not found.");
 			return ResponseEntity.notFound().build();
 		}
 		Cart cart = user.getCart();
 		if(cart.getItems().size() == 0) {
-			log.info(LogHelper.buildLogString("cart is empty"));
-			return new ResponseEntity("Cart is empty!", HttpStatus.OK);
+			log.info("POST /submit/{username} failed. CAUSE: Cart is empty.");
+			return ResponseEntity.badRequest().build();
 		}
 		UserOrder order = UserOrder.createFromCart(user.getCart());
 		orderRepository.save(order);
-		log.info(LogHelper.buildLogString(new String[]{"new order saved ", order.toString()}));
-		log.info(LogHelper.buildLogString("response 200 OK sent"));
+		user.setCart(new Cart());
+		userRepository.save(user);
+		log.info("POST /submit/{username} succeeded. RESPONSE: 200 OK");
 		return ResponseEntity.ok(order);
 	}
 	
 	@GetMapping("/history/{username}")
 	public ResponseEntity<List<UserOrder>> getOrdersForUser(@PathVariable String username) {
-		log.info(LogHelper.buildLogString(new String[]{"request for order history for user ", username}));
+		log.info("Activity in OrderController.");
+		log.info("GET request submitted to /history/{username}.");
 		ApplicationUser user = userRepository.findByUsername(username);
 		if(user == null) {
-			log.info(LogHelper.buildLogString("user not found"));
+			log.info("GET /history/{username} failed. CAUSE: User not found.");
 			return ResponseEntity.notFound().build();
 		}
-		log.info(LogHelper.buildLogString("response 200 OK sent"));
+		log.info("GET /history/{username} succeeded. RESPONSE: 200 OK");
 		return ResponseEntity.ok(orderRepository.findByUser(user));
 	}
 }

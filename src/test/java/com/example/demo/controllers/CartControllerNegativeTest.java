@@ -8,7 +8,6 @@ import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.ItemRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.ModifyCartRequest;
-import com.example.demo.util.LogHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +23,6 @@ import java.math.BigDecimal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -67,7 +65,6 @@ public class CartControllerNegativeTest {
     testCart = new Cart();
     testCart.addItem(testItem);
     testCart.setUser(testUser);
-    log.debug(LogHelper.buildLogString(testCart.toString()));
 
     TestUtils.injectObject(testCartController, "cartRepository", testCartRepository);
     TestUtils.injectObject(testCartController, "userRepository", testUserRepository);
@@ -76,6 +73,7 @@ public class CartControllerNegativeTest {
 
   @Test
   public void add_to_cart_no_user() throws Exception {
+    log.debug("Running test: add_to_cart_no_user");
     ModifyCartRequest request = new ModifyCartRequest();
     final ResponseEntity<Cart> response = testCartController.addToCart(request);
     assertNotNull(response);
@@ -84,6 +82,7 @@ public class CartControllerNegativeTest {
 
   @Test
   public void add_to_cart_item_not_found() throws Exception {
+    log.debug("Running test: add_to_cart_item_not_found");
     ModifyCartRequest request = new ModifyCartRequest();
     request.setUsername("john_smith");
     request.setItemId(99L);
@@ -95,6 +94,7 @@ public class CartControllerNegativeTest {
 
   @Test
   public void remove_from_cart_no_user() throws Exception {
+    log.debug("Running test: remove_from_cart_no_user");
     ModifyCartRequest request = new ModifyCartRequest();
     final ResponseEntity<Cart> response = testCartController.removeFromCart(request);
     assertNotNull(response);
@@ -103,6 +103,7 @@ public class CartControllerNegativeTest {
 
   @Test
   public void remove_from_cart_item_not_found() throws Exception {
+    log.debug("Running test: remove_from_cart_item_not_found");
     ModifyCartRequest request = new ModifyCartRequest();
     request.setUsername("john_smith");
     request.setItemId(99L);

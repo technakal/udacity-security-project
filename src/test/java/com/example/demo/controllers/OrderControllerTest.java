@@ -9,6 +9,8 @@ import com.example.demo.model.persistence.repositories.OrderRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 public class OrderControllerTest {
 
+  private final static Logger log = LoggerFactory.getLogger(OrderControllerTest.class);
   private OrderController testOrderController;
   private OrderRepository testOrderRepository = mock(OrderRepository.class);
   private UserRepository testUserRepository = mock(UserRepository.class);
@@ -32,6 +35,7 @@ public class OrderControllerTest {
 
   @Before
   public void setup() {
+
     // set up our controller and mocks
     testOrderController = new OrderController();
     TestUtils.injectObject(testOrderController, "orderRepository", testOrderRepository);
@@ -44,7 +48,7 @@ public class OrderControllerTest {
     testItem.setId(0L);
     testItem.setName("Test Item");
     testItem.setDescription("A really generic test item.");
-    testItem.setPrice(new BigDecimal(2.99));
+    testItem.setPrice(new BigDecimal("2.99"));
     testCart.addItem(testItem);
     TestUtils.injectObject(testUser, "cart", testCart);
 
@@ -53,21 +57,24 @@ public class OrderControllerTest {
     testOrder.setId(0L);
     testOrder.setUser(testUser);
     testOrder.setItems(Arrays.asList(testItem, testItem, testItem));
-    testOrder.setTotal(new BigDecimal(8.97));
+    testOrder.setTotal(new BigDecimal("8.97"));
   }
 
   @Test
   public void submit_order_happy_path() throws Exception {
+    log.debug("Running test: submit_order_happy_path.");
+    log.debug("Stubbing user.");
     when(testUserRepository.findByUsername("john_smith")).thenReturn(testUser);
     final ResponseEntity<UserOrder> response = testOrderController.submit(testUser.getUsername());
     assertNotNull(response);
     assertEquals(200, response.getStatusCodeValue());
     assertEquals(1, testCart.getItems().size());
-    assertEquals(new BigDecimal(2.99), testCart.getTotal());
+    assertEquals(new BigDecimal("2.99"), testCart.getTotal());
   }
 
   @Test
   public void submit_order_no_user() throws Exception {
+    log.debug("Running test: submit_order_no_user.");
     final ResponseEntity<UserOrder> response = testOrderController.submit(null);
     assertNotNull(response);
     assertEquals(404, response.getStatusCodeValue());
@@ -75,17 +82,20 @@ public class OrderControllerTest {
 
   @Test
   public void submit_order_no_items() throws Exception {
+    log.debug("Running test: submit_order_no_items.");
+    log.debug("Stubbing user.");
     when(testUserRepository.findByUsername("john_smith")).thenReturn(testUser);
     testUser.getCart().removeItem(testItem);
     final ResponseEntity<UserOrder> response = testOrderController.submit(testUser.getUsername());
     assertNotNull(response);
-    assertEquals(200, response.getStatusCodeValue());
-    assertEquals("Cart is empty!", response.getBody());
+    assertEquals(400, response.getStatusCodeValue());
     assertEquals(0, testCart.getItems().size());
   }
 
   @Test
   public void get_history_happy_path() throws Exception {
+    log.debug("Running test: get_history_happy_path.");
+    log.debug("Stubbing user.");
     when(testUserRepository.findByUsername("john_smith")).thenReturn(null);
     final ResponseEntity<List<UserOrder>> response = testOrderController.getOrdersForUser(testUser.getUsername());
     assertNotNull(response);
@@ -94,6 +104,7 @@ public class OrderControllerTest {
 
   @Test
   public void get_history_no_user() throws Exception {
+    log.debug("Running test: get_history_no_user.");
     final ResponseEntity<List<UserOrder>> response = testOrderController.getOrdersForUser(null);
     assertNotNull(response);
     assertEquals(404, response.getStatusCodeValue());

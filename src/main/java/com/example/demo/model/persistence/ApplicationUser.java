@@ -2,10 +2,8 @@ package com.example.demo.model.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import javax.persistence.*;
-import java.security.SecureRandom;
 
 
 @Entity

@@ -1,14 +1,10 @@
 package com.example.demo.models;
 
 import com.example.demo.model.persistence.Cart;
-import com.example.demo.model.persistence.Item;
-import com.example.demo.model.persistence.repositories.ItemRepository;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class CartTest {
 
